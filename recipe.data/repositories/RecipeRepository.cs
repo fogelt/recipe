@@ -39,10 +39,13 @@ public class RecipeRepository(RecipeDbContext context) : IRecipeRepository
 
   public async Task<bool> DeleteAsync(int id)
   {
-    var recipe = await _context.Recipes.FindAsync(id);
-    if (recipe == null) return false;
+    var recipe = await _context.Recipes
+        .Include(r => r.Ingredients)
+        .FirstOrDefaultAsync(r => r.Id == id);
 
+    if (recipe == null) return false;
     _context.Recipes.Remove(recipe);
+
     await _context.SaveChangesAsync();
     return true;
   }
