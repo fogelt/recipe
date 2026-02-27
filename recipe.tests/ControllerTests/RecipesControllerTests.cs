@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Moq;
 using recipe.api.Controllers;
+using recipe.core.DTOs;
 using recipe.core.Interfaces;
 using recipe.core.Models;
 namespace recipe.tests.ControllerTests;
@@ -32,7 +33,7 @@ public class RecipesControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        var returnedRecipes = Assert.IsAssignableFrom<IEnumerable<Recipe>>(okResult.Value);
+        var returnedRecipes = Assert.IsType<IEnumerable<Recipe>>(okResult.Value, exactMatch: false);
         Assert.Equal(2, returnedRecipes.Count());
     }
 
@@ -63,5 +64,51 @@ public class RecipesControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
         var recipe = Assert.IsType<Recipe>(okResult.Value);
         Assert.Equal("Pancakes", recipe.Name);
+    }
+
+    [Fact]
+    public async Task Create_ReturnsCreatedResult_WithNewRecipe()
+    {
+        var dto = new CreateRecipeDto { Name = "New Taco", Description = "Taco Desc" };
+        var createdRecipe = new Recipe { Id = 10, Name = "New Taco", Description = "Taco Desc" };
+
+        _mockService.Setup(s => s.CreateRecipeAsync(dto))
+                    .ReturnsAsync(createdRecipe);
+
+        var result = await _controller.Create(dto);
+
+        var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
+        Assert.Equal(nameof(_controller.GetById), createdResult.ActionName);
+        Assert.Equal(10, createdResult.RouteValues?["id"]);
+
+        var returnedRecipe = Assert.IsType<Recipe>(createdResult.Value);
+        Assert.Equal(10, returnedRecipe.Id);
+    }
+
+    [Fact]
+    public async Task Update_ReturnsOk_WhenUpdateIsSuccessful()
+    {
+        int targetId = 1;
+        var dto = new CreateRecipeDto { Name = "Updated Name" };
+        var updatedRecipe = new Recipe { Id = targetId, Name = "Updated Name" };
+
+        _mockService.Setup(s => s.UpdateRecipeAsync(targetId, dto))
+                    .ReturnsAsync(updatedRecipe);
+
+        var result = await _controller.Update(targetId, dto);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var recipe = Assert.IsType<Recipe>(okResult.Value);
+        Assert.Equal("Updated Name", recipe.Name);
+    }
+
+    [Fact]
+    public async Task Delete_ReturnsNoContent_WhenDeleted()
+    {
+        _mockService.Setup(s => s.DeleteRecipeAsync(1)).ReturnsAsync(true);
+
+        var result = await _controller.Delete(1);
+
+        Assert.IsType<NoContentResult>(result);
     }
 }
