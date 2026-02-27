@@ -1,10 +1,26 @@
 using recipe.core.DTOs;
 using recipe.core.Interfaces;
 using recipe.core.Models;
-using recipe.core.Services;
 
 public class RecipeService : IRecipeService
 {
+    private readonly IGenericRepositry<Recipe> _repository;
+
+    public RecipeService(IGenericRepositry<Recipe> repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<IEnumerable<Recipe>> GetAllAsync()
+    {
+        return await _repository.GetAllAsync();
+    }
+
+    public async Task<Recipe?> GetByIdAsync(int id)
+    {
+        return await _repository.GetByIdAsync(id);
+    }
+
     public Task<Recipe> CreateAsync(Recipe recipe)
     {
         throw new NotImplementedException();
@@ -13,14 +29,7 @@ public class RecipeService : IRecipeService
     {
         throw new NotImplementedException();
     }
-    public Task<IEnumerable<Recipe>> GetAllAsync()
-    {
-        throw new NotImplementedException();
-    }
-    public Task<Recipe?> GetByIdAsync(int id)
-    {
-        throw new NotImplementedException();
-    }
+
     public Task<IEnumerable<Recipe>> GetByDifficultyAsync(string level)
     {
         throw new NotImplementedException();
