@@ -1,14 +1,15 @@
 ﻿using recipe.core.Models;
-using recipe.core.Services;
-
+using recipe.core.services;
+using recipe.core.Interfaces;
+using Moq;
 public class RecipeServiceTests
 {
-    private readonly Mock<IRecipeService> _mockRepo;
+    private readonly Mock<IGenericRepository<Recipe>> _mockRepo;
     private readonly RecipeService _service;
 
     public RecipeServiceTests()
     {
-        _mockRepo = new Mock<IRecipe>();
+        _mockRepo = new Mock<IGenericRepository<Recipe>>();
         _service = new RecipeService(_mockRepo.Object);
     }
 
@@ -21,7 +22,7 @@ public class RecipeServiceTests
                  .ReturnsAsync(recipe);
 
         // Act
-        var result = await _service.GetByIdAsync(1);
+        var result = await _service.GetRecipeByIdAsync(1);
 
         // Assert
         Assert.NotNull(result);
@@ -36,7 +37,7 @@ public class RecipeServiceTests
                  .ReturnsAsync((Recipe?)null);
 
         // Act
-        var result = await _service.GetByIdAsync(999);
+        var result = await _service.GetRecipeByIdAsync(1);
 
         // Assert
         Assert.Null(result);
