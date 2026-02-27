@@ -41,6 +41,7 @@ public class RecipeService : IRecipeService
                 Unit = i.Unit
             }).ToList(),
             CreatedAt = DateTime.UtcNow,
+            Difficulty = DetermineDifficulty(dto)
         };
 
         return await _repository.CreateAsync(recipe);
@@ -64,6 +65,7 @@ public class RecipeService : IRecipeService
             Quantity = i.Quantity,
             Unit = i.Unit
         }).ToList();
+        existing.Difficulty = DetermineDifficulty(dto);
 
         return await _repository.UpdateAsync(existing);
     }
@@ -75,11 +77,29 @@ public class RecipeService : IRecipeService
 
     public async Task<IEnumerable<Recipe>> SearchRecipesAsync(string term)
     {
+        if (string.IsNullOrWhiteSpace(term))
+            return await _repository.GetAllAsync();
 
+        var t = term.Trim().ToLower();
+        return await _repository.FindAsync(r =>
+          (r.Name != null && r.Name.ToLower().Contains(t)) ||
+          (r.Description != null && r.Description.ToLower().Contains(t)));
     }
 
-    public async Task<IEnumerable<Recipe>> GetRecipesByDifficultyAsync(string level)
-    {
+      public async Task<IEnumerable<Recipe>> GetRecipesByDifficultyAsync(string level)
+      {
+        if (string.IsNullOrWhiteSpace(level))
+          return Enumerable.Empty<Recipe>();
 
+        var lvl = level.Trim().ToLower();
+        return await _repository.FindAsync(r => r.Difficulty != null && r.Difficulty.ToLower() == lvl);
+      }
+
+    private static string DetermineDifficulty(CreateRecipeDto dto)
+    {
+        var steps = dto.Instructions?.Count ?? 0;
+        if (steps >= 8) return "Hard";
+        if (steps >= 4) return "Medium";
+        return "Easy";
     }
 }
