@@ -13,12 +13,17 @@ public class RecipeDbContext(DbContextOptions<RecipeDbContext> options) : DbCont
   {
     base.OnModelCreating(modelBuilder);
 
-    // This tells EF Core how to handle List<string> in SQLite
+    modelBuilder.Entity<Recipe>()
+            .HasMany(r => r.Ingredients)
+            .WithOne()
+            .HasForeignKey("RecipeId")
+            .OnDelete(DeleteBehavior.Cascade);
+
     modelBuilder.Entity<Recipe>()
         .Property(e => e.Instructions)
         .HasConversion(
-            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-            v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null!)
+            v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null!),
+            v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions)null!)
         );
 
     modelBuilder.Entity<Ingredient>().HasData(

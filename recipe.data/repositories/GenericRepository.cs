@@ -26,23 +26,27 @@ public class GenericRepository<T>(RecipeDbContext context) : IGenericRepository<
     return entity;
   }
 
-    public async Task<T> UpdateAsync(T entity)
-    {
-        _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
-        return entity;
-    }
+  public async Task<T> UpdateAsync(T entity)
+  {
+    _dbSet.Update(entity);
+    await _context.SaveChangesAsync();
+    return entity;
+  }
 
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var found = await _dbSet.FindAsync(id);
-        if (found == null) return false;
-        _dbSet.Remove(found);
-        await _context.SaveChangesAsync();
-        return true;
-    }
+  public async Task<bool> DeleteAsync(int id)
+  {
+    var entity = await _context.Recipes
+        .Include(r => r.Ingredients)
+        .FirstOrDefaultAsync(r => r.Id == id);
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    if (entity == null) return false;
+
+    _context.Recipes.Remove(entity);
+    await _context.SaveChangesAsync();
+    return true;
+  }
+
+  public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
   {
     return await _dbSet.Where(predicate).ToListAsync();
   }
