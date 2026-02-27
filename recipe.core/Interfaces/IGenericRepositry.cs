@@ -1,4 +1,4 @@
-namespace recipe.core.interfaces;
+namespace recipe.core.Interfaces;
 
 public interface IGenericRepository<T> where T : class
 {
