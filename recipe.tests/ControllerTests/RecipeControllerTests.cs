@@ -1,4 +1,4 @@
-﻿namespace recipe.tests;
+﻿namespace recipe.tests.ControllerTests;
 
 public class UnitTest1
 {
