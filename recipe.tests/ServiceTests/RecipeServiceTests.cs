@@ -2,17 +2,17 @@
 using recipe.core.DTOs;
 using recipe.core.Interfaces;
 using recipe.core.Models;
-using recipe.core.services;
+using recipe.core.Services;
 
 public class RecipeServiceTests
 {
-    private readonly Mock<IGenericRepository<Recipe>> _mockRepo;
+    private readonly Mock<IRecipeRepository> _mockRepo;
     private readonly RecipeService _service;
     private readonly CreateRecipeDto _recipeDto;
 
     public RecipeServiceTests()
     {
-        _mockRepo = new Mock<IGenericRepository<Recipe>>();
+        _mockRepo = new Mock<IRecipeRepository>();
         _service = new RecipeService(_mockRepo.Object);
         _recipeDto = new CreateRecipeDto
         {

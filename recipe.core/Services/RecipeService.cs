@@ -2,13 +2,13 @@ using recipe.core.DTOs;
 using recipe.core.Interfaces;
 using recipe.core.Models;
 
-namespace recipe.core.services;
+namespace recipe.core.Services;
 
 public class RecipeService : IRecipeService
 {
-  private readonly IGenericRepository<Recipe> _repository;
+  private readonly IRecipeRepository _repository;
 
-  public RecipeService(IGenericRepository<Recipe> repository)
+  public RecipeService(IRecipeRepository repository)
   {
     _repository = repository;
   }
@@ -89,7 +89,7 @@ public class RecipeService : IRecipeService
   public async Task<IEnumerable<Recipe>> GetRecipesByDifficultyAsync(string level)
   {
     if (string.IsNullOrWhiteSpace(level))
-      return Enumerable.Empty<Recipe>();
+      return [];
 
     var lvl = level.Trim().ToLower();
     return await _repository.FindAsync(r => r.Difficulty != null && r.Difficulty.ToLower() == lvl);
