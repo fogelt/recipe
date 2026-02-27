@@ -15,8 +15,4 @@
     <ProjectReference Include="..\recipe.core\recipe.core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
